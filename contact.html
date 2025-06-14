@@ -31,6 +31,67 @@
           </form>        
         </center>
     </div>
-<script src="script.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD5CtrLGHD32cVMYHlS8KpxtVwd6afE5Hs",
+  authDomain: "my-portfolio-d0702.firebaseapp.com",
+  projectId: "my-portfolio-d0702",
+  storageBucket: "my-portfolio-d0702.firebasestorage.app",
+  messagingSenderId: "506539521066",
+  appId: "1:506539521066:web:df35d4a3149d90182ebf53",
+  measurementId: "G-W81P4XCTBP"
+};
+
+// Initialize Firebase and Firestore
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Handle form submission
+document.getElementById("contactForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const message = document.getElementById("message").value.trim();
+  const formMsg = document.getElementById("formMsg");
+
+  const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+  // Validate input fields
+  if (!name || !email || !message) {
+    formMsg.textContent = "All fields are required.";
+    formMsg.style.color = "red";
+    return;
+  }
+
+  if (!email.match(emailPattern)) {
+    formMsg.textContent = "Please enter a valid email address.";
+    formMsg.style.color = "red";
+    return;
+  }
+
+  // Submit data to Firestore
+  try {
+    await addDoc(collection(db, "contacts"), {
+      name,
+      email,
+      message,
+      timestamp: new Date()
+    });
+
+    formMsg.textContent = "Message sent successfully!";
+    formMsg.style.color = "green";
+    document.getElementById("contactForm").reset();
+  } catch (error) {
+    console.error("Error writing to Firestore:", error);
+    formMsg.textContent = "Error sending message. Try again.";
+    formMsg.style.color = "red";
+  }
+});
+</script>
 </body>
 </html>
